@@ -2,12 +2,13 @@ import React from "react";
 import { useState } from "react";
 import { Button, Image, Pressable, StyleSheet, Text, TextInput } from "react-native";
 import { View } from "react-native";
+import { StatusTarefa } from "../models/Tarefa";
 
 type CardProps = {
     id: number,
     titulo: string,
     descricao: string,
-    status: string,
+    status: StatusTarefa,
     onPress: () => void
 }
 
@@ -19,12 +20,22 @@ export default function Card({
     onPress
     }: CardProps) 
 {
+
+  function formatarStatus(status: StatusTarefa) {
+    if(status === 'EmAndamento') {
+      return 'Em Andamento';
+    }
+    if(status === 'Concluida') {
+      return 'Concluída';
+    }
+    return 'Pendente';
+  }
  
     return (
         <View style={styles.card}>
             <Text style={styles.titulo}>{ titulo }</Text>
             <Text style={styles.descricao}>{ descricao }</Text>
-            <Text style={styles.status}>{ status }</Text>
+            <Text style={styles.status}>{ formatarStatus(status) }</Text>
 
             <Pressable 
                 style={styles.botaoExcluir}

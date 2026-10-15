@@ -1,30 +1,62 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-native";
 import Botao from "../components/Botao";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tarefa } from "../models/Tarefa";
 import Card from "../components/Card";
+import { listarTarefas } from "../services/tarefaService";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Lista'>
 
 export default function ListaScreen({navigation} : Props){
-    const[tarefas, setTarefas] = useState<Tarefa[]>([
-		{
-			id: 1,
-			titulo: 'Estudar Desenvolvimento Mobile',
-			descricao: 'Revisar Estados e Propriedades',
-			status: 'Pendente'
-		},
-		{
-			id: 2,
-			titulo: 'Me preparar para o ENADE',
-			descricao: 'Revisar Todo o Conteúdo',
-			status: 'Pendente'
-		},
-	]);
+    const[tarefas, setTarefas] = useState<Tarefa[]>([]);
+	const[carregando, setCarregando] = useState(false);
+	const[erro, setErro] = useState<string>('');
+
+	async function carregarTarefas(){
+		try {
+			setCarregando(true);
+			setErro('');
+
+			const dados = await listarTarefas();
+			setTarefas(dados);
+		} catch(error) {
+			setErro('Erro ao carregar as Tarefas! =(')
+		} finally {
+			setCarregando(false);
+		}
+	}
+
+	useEffect(() => {
+		carregarTarefas();
+	}, [])
+
+	if (carregando){
+		return(
+			<View style={styles.centro}>
+				<ActivityIndicator size="large" />  
+				<Text>Aguarde...</Text>
+			</View>
+		)
+	}
+
+	if(erro !== ''){
+		<View>
+			<Text>{erro}</Text>
+			<Botao titulo="Tentar novamente!" onPress={carregarTarefas}></Botao>
+		</View>
+	}
+
     return(
         <View style={styles.container}>
+
+			<View style={styles.cabecalho}>
+				<Text style={styles.tituloApp}>Minhas Tarefas</Text>
+				<Text>{tarefas.length === 0 ? 'Nenhuma Tarefa' : `${tarefas.length} tarefa(s)`}</Text>
+				<Botao titulo="[+] Nova Tarefa" onPress={() => navigation.navigate('Cadastro')}></Botao>
+			</View>
+
             <FlatList
                 data={tarefas}
                 keyExtractor={(item => item.id.toString())}
@@ -60,7 +92,18 @@ const styles = StyleSheet.create({
 	container: {
 	  flex: 1,
 	},
-  
+	
+	centro: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		padding: 24
+	},
+
+	mensagem: {
+		marginTop: 12
+	},
+
 	conteudo: {
 	  padding: 24,
 	  paddingTop: 50,
