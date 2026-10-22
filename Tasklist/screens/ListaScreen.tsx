@@ -2,10 +2,11 @@ import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-nativ
 import Botao from "../components/Botao";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Tarefa } from "../models/Tarefa";
 import Card from "../components/Card";
 import { listarTarefas } from "../services/tarefaService";
+import { useFocusEffect } from "@react-navigation/native";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Lista'>
 
@@ -28,9 +29,9 @@ export default function ListaScreen({navigation} : Props){
 		}
 	}
 
-	useEffect(() => {
-		carregarTarefas();
-	}, [])
+	useEffect(
+		useCallback(()=> {carregarTarefas()},[])
+	);
 
 	if (carregando){
 		return(

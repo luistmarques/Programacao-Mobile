@@ -6,3 +6,9 @@ export type Tarefa = {
     descricao: string,
     status: StatusTarefa;
 }
+
+export type TarefaRequest = {
+    titulo: number,
+    descricao: string,
+    status: StatusTarefa
+}
